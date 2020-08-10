@@ -24,7 +24,7 @@ export default class App extends Component {
 
   render() {
     return (
-      <SafeAreaView >
+      <SafeAreaView style={styles.container}>
         <View style={styles.main}>
         <Text>Add your expense</Text>
         <TextInput 
@@ -110,6 +110,10 @@ const pickerPlaceholder = {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: Platform.OS === 'android' ? 25 : 0
+  },
   main: {
     paddingHorizontal: 10,
   },
