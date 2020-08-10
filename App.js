@@ -1,121 +1,113 @@
- 
-import { StatusBar } from 'expo-status-bar'
-import React, { Component } from 'react'
-import { StyleSheet, Text, View, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native'
-// third party components
-import RNPickerSelect from 'react-native-picker-select'
+import { StatusBar } from 'expo-status-bar';
+import React , {Component} from 'react';
+import { StyleSheet, Text, View, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native';
+// third-party components
+import RNPickerSelect from 'react-native-picker-select';
 // custom components
-import { Item } from './components/Item'
+import {Item} from './components/Item';
 
 export default class App extends Component {
   state = {
-    expenseAmount: 0,
-    selectedCategory: '',
-    submitting: false,
+    expenseAmount : 0,
+    expenseCategory: '',
+    validInput: false,
   }
-
   listData = []
 
   dropdownItems = [
-    { label: 'Food', value: 'food' },
-    { label: 'Transport', value: 'transport' },
-    { label: 'Grocery', value: 'grocery' },
-    { label: 'Utility', value: 'utility' },
-    { label: 'Fuel', value: 'fuel' },
-    { label: 'Rent', value: 'rent' },
+    { label: 'Food' , value: 'food' },
+    { label: 'Transport' , value: 'transport' },
+    { label: 'Rent' , value: 'rent' },
+    { label: 'Grocery' , value: 'grocery' },
+    { label: 'Entertainment' , value: 'entertainment' },
   ]
 
   render() {
     return (
-      <SafeAreaView>
+      <SafeAreaView >
         <View style={styles.main}>
-          <Text>Add your expense</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="$ amount"
-            onChangeText={(text) =>
-              this.setState({ expenseAmount: parseFloat(text) }, () => {this.verifyInput()} )
-            }
-            keyboardType="number-pad"
-            // ref is used to create reference to this component
-            ref={(exp) => (this._input = exp)}
-          />
-          {/* <TextInput
+        <Text>Add your expense</Text>
+        <TextInput 
+          style={styles.input}
+          placeholder="$ amount" 
+          onChangeText={ text => this.setState({expenseAmount: parseFloat(text) },
+            () => { this.validate() }
+          ) } 
+          keyboardType="number-pad" 
+          ref={(input) => ( this._textInput = input )}/>
+        {/* <TextInput
           style={styles.input}
           placeholder="category"
           onChangeText={ text => this.setState({ expenseCategory: text }) }
         /> */}
-          <RNPickerSelect
-            onValueChange={(value) => {
-              this.setState({ selectedCategory: value }, () => {this.verifyInput()} )
-            }}
-            items={this.dropdownItems}
-            style={picker}
-            value={this.state.selectedCategory}
-            placeholder={placeholder}
-            useNativeAndroidPickerStyle={false}
+          <RNPickerSelect 
+            items = { this.dropdownItems }
+            value = { this.state.expenseCategory }
+            onValueChange = { value => this.setState({expenseCategory: value},
+              () => { this.validate() }
+            ) }
+            useNativeAndroidPickerStyle = {false}
+            style={pickerStyle}
+            placeholder={pickerPlaceholder}
           />
         </View>
         {/* wrap the button in view */}
-        <View style={styles.main}>
+        <View>
           <TouchableOpacity 
-            style={ this.state.submitting ? styles.button : styles.buttonDisabled } 
-            onPress={this.addItem} 
-            disabled={ !this.state.submitting ? true : false }>
-            <Text style={styles.buttonText}>Add</Text>
+            style={ this.state.validInput ? styles.button : styles.buttonDisabled } 
+            onPress= {this.addItem}
+            disabled = { !this.state.validInput ? true : false}
+          >
+            <Text style={styles.buttonText} >Add</Text>
           </TouchableOpacity>
         </View>
-
-        <FlatList
-          data={this.listData}
-          renderItem={this.renderList}
-          keyExtractor={(item) => item.id}
-          extraData={this.state.expenseAmount}
+        
+        <FlatList 
+          data = {this.listData}
+          renderItem = { this.renderList }
+          keyExtractor = { item => item.id }
+          extraData = {this.state.expenseAmount}
         />
       </SafeAreaView>
     )
   }
-  renderList = ({ item }) => (
+  renderList = ({item}) => (
     <Item amount={item.amount} category={item.category} />
   )
   addItem = () => {
-    if (
-      isNaN(this.state.expenseAmount) ||
-      this.state.expenseAmount == 0 ||
-      this.state.selectedCategory == ''
-    ) 
-    {
-      return
+    if( 
+      isNaN(this.state.expenseAmount) || 
+      this.state.expenseAmount == 0 || 
+      this.state.expenseCategory == '' ) {
+      return;
     }
     let itemId = new Date().getTime().toString()
     let listItem = {
       id: itemId,
       amount: this.state.expenseAmount,
-      category: this.state.selectedCategory,
+      category: this.state.expenseCategory
     }
     this.listData.push(listItem)
-    this.setState({ expenseAmount: 0, selectedCategory: null, submitting: false })
-    // we use the ref in TextInput to clear and focus it
-    this._input.clear()
-    this._input.focus()
+    this.setState({expenseAmount:0, expenseCategory: null, validInput: false })
+    this._textInput.clear()
+    this._textInput.focus()
   }
 
-  verifyInput = () => {
-    // verify if input and dropdown have value, then change submitting state
-    if( this.state.expenseAmount > 0 && this.state.selectedCategory ) {
-      this.setState({submitting: true})
+  validate = () => {
+    if( this.state.expenseAmount > 0 && this.state.expenseCategory ) {
+      this.setState({validInput:true})
     }
   }
 }
 
-// theme colors
 const colors = {
-  primary: 'hsla(330, 38%, 65%, 1)',
+  primary : 'hsla(330, 38%, 65%, 1)',
   primaryDisabled: 'hsla(330, 38%, 80%, 1)',
 }
-//default for dropdown
-const placeholder = { label: 'pick a type', value: null, color: 'black' }
 
+const pickerPlaceholder = {
+  label: 'select category', value: null, color: 'black'
+}
 
 const styles = StyleSheet.create({
   main: {
@@ -126,37 +118,33 @@ const styles = StyleSheet.create({
     padding: 10,
     borderColor: 'black',
     borderWidth: 1,
-    marginVertical: 15,
+    marginVertical: 15
   },
   button: {
-    padding: 10,
+    padding: 15,
     backgroundColor: colors.primary,
-    marginVertical: 15,
-  },
-  buttonDisabled: {
-    padding: 10,
-    backgroundColor: colors.primaryDisabled,
-    marginVertical: 15,
+    marginVertical: 15
   },
   buttonText: {
     color: 'white',
-    textAlign: 'center',
+    textAlign: 'center'
+  },
+  buttonDisabled: {
+    padding: 15,
+    backgroundColor: colors.primaryDisabled,
+    marginVertical: 15,
   },
 })
 
-const picker = StyleSheet.create({
+const pickerStyle = StyleSheet.create({
   inputIOS: {
     padding: 10,
     borderColor: colors.primary,
     borderWidth: 1,
-    minWidth: '100%',
   },
   inputAndroid: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderWidth: 1,
+    padding: 10,
     borderColor: colors.primary,
-    paddingRight: 30,
-  },
+    borderWidth: 1,
+  }
 })
-
