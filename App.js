@@ -2,6 +2,10 @@ import { StatusBar } from 'expo-status-bar';
 import React , {Component} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, FlatList, TextInput, TouchableOpacity } from 'react-native';
 
+// Third-party components
+import RNPickerSelect from 'react-native-picker-select';
+
+// Custom components
 import {Item} from './components/Item';
 
 export default class App extends Component {
@@ -10,6 +14,14 @@ export default class App extends Component {
     expenseCategory: '',
   }
   listData = []
+  dropDownItems = [
+    { label: 'Food' , value: 'food'},
+    { label: 'Transport' , value: 'transport'},
+    { label: 'Rent' , value: 'rent'},
+    { label: 'Grocery' , value: 'grocery'},
+    { label: 'Entertainment' , value: 'grocery'},
+    { label: 'Phone Bill' , value: 'phonebill'}
+  ]
 
   render() {
     return (
@@ -21,10 +33,16 @@ export default class App extends Component {
           placeholder="$ amount" 
           onChangeText={ text => this.setState({expenseAmount: parseFloat(text) }) } 
           keyboardType="number-pad" />
-        <TextInput
+        {/* <TextInput
           style={styles.input}
           placeholder="category"
           onChangeText={ text => this.setState({ expenseCategory: text }) }
+        /> */}
+        <RNPickerSelect
+            items = { this.dropDownItems }
+            value = { this.state.expenseCategory }
+            onValueChange = {value =>  this.setState({expenseCategory : value})}
+            useNativeAndroidPickerStyle = {false}
         />
         </View>
         {/* wrap the button in view */}
